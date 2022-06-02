@@ -78,6 +78,8 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("EmployeeID");
 
+                    b.HasIndex("SkillId");
+
                     b.ToTable("EmployeeSkills");
                 });
 
@@ -132,6 +134,14 @@ namespace DataAccess.Migrations
                         .HasForeignKey("EmployeeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Model.Entity.Skill", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("Model.Entity.Payroll", b =>

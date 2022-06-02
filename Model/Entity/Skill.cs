@@ -10,5 +10,10 @@ namespace Model.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public Task<List<object>> ToListAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Dapper;
 using DataAccess.Data;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Model.DTO;
+using Model.Entity;
+using Model.View;
 using Service.IRepositroy;
 using System;
 using System.Collections.Generic;
@@ -15,12 +18,14 @@ namespace Service.Implimantation
 {
     public class EmployeeOperations : IEmployeeOperations
     {
-
+        private readonly EmployeeContext _context;
         private readonly IConfiguration _config;
 
         public EmployeeOperations(EmployeeContext context, IConfiguration config)
         {
-            _config = config; ;
+            _context = context;
+            _config = config; 
+
         }
         public async Task<bool> EmployeeAsync(EmployeeDTO employeeDTO)
         {
@@ -50,6 +55,13 @@ namespace Service.Implimantation
                 throw;
             }
             return true;
+        }
+
+        public async Task<IReadOnlyList<Employee>> GetEmployeeAsync()
+        {
+            return  await _context.Employees 
+                .Include(p => p.EmployeeSkills)
+                .ToListAsync();
         }
     }
 }

@@ -10,6 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
+using Service.IRepositroy;
+using Service.Implimantation;
 
 namespace EmployeeManagement
 {
@@ -25,6 +27,7 @@ namespace EmployeeManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IEmployeeOperations, EmployeeOperations>();
             services.AddDbContext<EmployeeContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnetion"));

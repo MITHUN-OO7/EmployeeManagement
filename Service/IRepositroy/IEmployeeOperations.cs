@@ -1,4 +1,6 @@
 ﻿using Model.DTO;
+using Model.Entity;
+using Model.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,7 @@ namespace Service.IRepositroy
     public interface IEmployeeOperations
     {
         Task<bool> EmployeeAsync(EmployeeDTO employeeDTO);
+        Task<IReadOnlyList<Employee>> GetEmployeeAsync();
+
     }
 }

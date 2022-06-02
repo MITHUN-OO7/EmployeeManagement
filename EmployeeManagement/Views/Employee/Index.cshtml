@@ -31,7 +31,21 @@
     </table>
 </div>
 <script type="text/javascript">
-    $('#btnAddEmployee').click(function () {
-       document.location = '@Url.Action("AddEmployee","Employee")';
+    $(document).ready(function() {
+        getEmployee();
+    })
+    $('#btnAddEmployee').click(function() {
+        document.location = '@Url.Action("AddEmployee","Employee")';
     });
+    function getEmployee() {
+        $.ajax({
+            url: 'Employee/GetEmployee',
+            type: 'GET',
+            success: function(data, textStatus, xhr) {
+
+            },
+            error: function(data) {
+            }
+        });
+    }
 </script>
