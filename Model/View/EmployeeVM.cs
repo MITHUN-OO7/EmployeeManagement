@@ -1,5 +1,4 @@
-﻿using Model.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,5 +20,17 @@ namespace Model.View
         public string State { get; set; }
         public string Country { get; set; }
         public ICollection<EmployeeSkills> EmployeeSkills { get; set; }
+        public ICollection<SkillsVM> Skills { get; set; }
+    }
+    public class SkillsVM
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+    public class EmployeeSkills
+    {
+        public int Id { get; set; }
+        public int EmployeeId { get; set; }
+        public int SkillId { get; set; }
     }
 }

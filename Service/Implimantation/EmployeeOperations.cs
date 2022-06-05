@@ -24,11 +24,12 @@ namespace Service.Implimantation
         public EmployeeOperations(EmployeeContext context, IConfiguration config)
         {
             _context = context;
-            _config = config; 
+            _config = config;
 
         }
         public async Task<bool> EmployeeAsync(EmployeeDTO employeeDTO)
         {
+            int results = 0;
             try
             {
                 var queryParameters = new DynamicParameters();
@@ -43,26 +44,55 @@ namespace Service.Implimantation
                 queryParameters.Add("@State ", employeeDTO.State);
                 queryParameters.Add("@Country", employeeDTO.Country);
                 queryParameters.Add("@Skills", employeeDTO.SkillsIds);
+                queryParameters.Add("@Basic", employeeDTO.Basic);
+                queryParameters.Add("@TA", employeeDTO.TA);
+                queryParameters.Add("@DA", employeeDTO.DA);
+                queryParameters.Add("@Bonus", employeeDTO.Bonus);
                 queryParameters.Add("@Flag", employeeDTO.Flag);
                 using (var connection = new SqlConnection(_config.GetConnectionString("DefaultConnetion")))
                 {
                     await connection.OpenAsync();
-                    var results = await connection.ExecuteAsync(sql: "Proc_Employee", param: queryParameters, commandType: CommandType.StoredProcedure);
+                    results = await connection.ExecuteAsync(sql: "Proc_Employee", param: queryParameters, commandType: CommandType.StoredProcedure);
                 }
             }
             catch (Exception)
             {
                 throw;
             }
-            return true;
+            return results > 0 ? true : false;
         }
 
-        public async Task<IReadOnlyList<Employee>> GetEmployeeAsync()
+        public async Task<IReadOnlyList<dynamic>> GetEmployeeAsync()
         {
-            return  await _context.Employees 
-                .Include(p => p.EmployeeSkills)
+            var employees = await _context.Employees
                 .ToListAsync();
+            return employees;
+
+
         }
+        public async Task<EmployeeDetail> GetEmployeeDetailsAsync(int id)
+        {
+            EmployeeDetail employeeDetail = new()
+            {
+                Employee = await _context.Employees.Where(x => x.Id == id).FirstOrDefaultAsync(),
+                Skills = (ICollection<Model.Entity.Skill>)await _context.EmployeeSkills
+                .Include(a => a.Skill)
+                .Where(x => x.EmployeeId == id).Select(p => new Skill()
+                {
+                    Id = p.Skill.Id,
+                    Name = p.Skill.Name,
+                }).ToListAsync(),
+                Payroll = await _context.Payrolls.Where(x => x.EmployeeId == id).FirstOrDefaultAsync()
+            };
+
+            return employeeDetail;
+        }
+
+        public async Task<IReadOnlyList<Skill>> GetSkillsAsync()
+        {
+            return await _context.Skills.ToListAsync();
+        }
+
     }
 }
 

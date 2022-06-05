@@ -2,45 +2,135 @@
     ViewBag.Title = "Add Employee";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+</style>
+<div class="container">
+    <div class="container">
+        <div style="font-size: 18px; font-weight: bold;">Personal Details</div>
+        <table>
+
+            <tbody>
+                <tr>
+                    <th>First Name</th>
+                    <td><input type="text" id="txtFName" class="form-control" /></td>
+                    <th>Last Name</th>
+                    <td><input type="text" id="txtLName" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>DOB</th>
+                    <td><input type="text" id="txtDOB" class="form-control" /></td>
+                    <th>Email</th>
+                    <td><input type="text" id="txtEmail" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>Address</th>
+                    <td><input type="text" id="txtAddress" class="form-control" /></td>
+                    <th>City</th>
+                    <td><input type="text" id="txtCity" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>State</th>
+                    <td><input type="text" id="txtState" class="form-control" /></td>
+                    <th>Country</th>
+                    <td><input type="text" id="txtCountry" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>Employment Date</th>
+                    <td><input type="text" id="txtEmploymentDate" class="form-control" /></td>
+                    <th>Skills</th>
+                    <td><select id="ddlSkills" style="width:400px" multiple></select></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <div class="container">
+        <div style="font-size: 18px; font-weight: bold;">Payroll</div>
+        <table>
+
+            <tbody>
+                <tr>
+                    <th>Basic</th>
+                    <td><input type="number" id="txtBasic" class="form-control" /></td>
+                    <th>TA</th>
+                    <td><input type="number" id="txtTA" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>DA</th>
+                    <td><input type="number" id="txtDA" class="form-control" /></td>
+                    <th>Bonus</th>
+                    <td><input type="number" id="txtBonus" class="form-control" /></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <br />
+    <button type="button" class="btn btn-danger" style="float:right" id="btnBack">Back</button>
+    <button type="button" class="btn btn-primary" style="float:right" onclick="saveEmployee()">Save</button>
 </div>
- <div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
-<div class="row">
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-  <div class="col">col</div>
-</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        getSkills();
+        $('#ddlSkills').select2();
+        $("#txtDOB").val(moment().format("DD-MMM-YYYY"));
+        $("#txtEmploymentDate").val(moment().format("DD-MMM-YYYY"));
+
+    })
+     $('#btnBack').click(function() {
+        document.location = '@Url.Action("Index","Employee")';
+    });
+    $('#btnAddEmployee').click(function() {
+        document.location = '@Url.Action("AddEmployee","Employee")';
+    });
+    function getSkills() {
+        $.ajax({
+            url: 'GetSkills',
+            type: 'GET',
+            success: function(result, textStatus, xhr) {
+                console.log(result);
+                for (var i = 0; i < result.length; i++) {
+                    $('#ddlSkills').append($('<option/>').attr("value", result[i].id).text(result[i].name), "name", result[i].Name);
+                }
+            },
+            error: function(data) {
+            }
+        });
+    }
+    function saveEmployee() {
+        var employeeDTO = new Object();
+        employeeDTO.FirstName = $("#txtFName").val();
+        employeeDTO.LastName = $("#txtLName").val();
+        employeeDTO.DOB = $("#txtDOB").val();
+        employeeDTO.Email = $("#txtEmail").val();
+        employeeDTO.EmploymentDate = $("#txtEmploymentDate").val();
+        employeeDTO.Address = $("#txtAddress").val();
+        employeeDTO.City = $("#txtCity").val();
+        employeeDTO.State = $("#txtState").val();
+        employeeDTO.Country = $("#txtCountry").val();
+        employeeDTO.SkillsIds = $("#ddlSkills").val().toString();
+        employeeDTO.Basic= $("#txtBasic").val();
+        employeeDTO.TA= $("#txtTA").val();
+        employeeDTO.DA = $("#txtDA").val();
+        employeeDTO.Bonus= $("#txtBonus").val();
+        employeeDTO.Flag = 0;
+        console.log(employeeDTO)
+        $.ajax({
+            url: 'AddEmployeeDetail',
+            type: 'POST',
+            data: { employeeDTO },
+            success: function(result, textStatus, xhr) {
+                alert("Detail saved");
+            },
+            error: function(data) {
+            }
+        });
+    }
+
+</script>
+

@@ -12,7 +12,8 @@ namespace Service.IRepositroy
     public interface IEmployeeOperations
     {
         Task<bool> EmployeeAsync(EmployeeDTO employeeDTO);
-        Task<IReadOnlyList<Employee>> GetEmployeeAsync();
-
+        Task<IReadOnlyList<dynamic>> GetEmployeeAsync();
+        Task<EmployeeDetail> GetEmployeeDetailsAsync(int id);
+        Task<IReadOnlyList<Skill>> GetSkillsAsync();
     }
 }

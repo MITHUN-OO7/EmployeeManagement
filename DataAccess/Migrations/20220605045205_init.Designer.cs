@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20220602014911_sssD")]
-    partial class sssD
+    [Migration("20220605045205_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,7 +43,7 @@ namespace DataAccess.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("EmployeeCode")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EmploymentDate")
@@ -70,7 +70,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EmployeeID")
+                    b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<int>("SkillId")
@@ -78,7 +78,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeID");
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("SkillId");
 
@@ -121,19 +121,24 @@ namespace DataAccess.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("Model.Entity.EmployeeSkills", b =>
                 {
-                    b.HasOne("Model.Entity.Employee", null)
+                    b.HasOne("Model.Entity.Employee", "Employee")
                         .WithMany("EmployeeSkills")
-                        .HasForeignKey("EmployeeID")
+                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -142,6 +147,8 @@ namespace DataAccess.Migrations
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Skill");
                 });
@@ -157,9 +164,18 @@ namespace DataAccess.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("Model.Entity.Skill", b =>
+                {
+                    b.HasOne("Model.Entity.Employee", null)
+                        .WithMany("Skills")
+                        .HasForeignKey("EmployeeId");
+                });
+
             modelBuilder.Entity("Model.Entity.Employee", b =>
                 {
                     b.Navigation("EmployeeSkills");
+
+                    b.Navigation("Skills");
                 });
 #pragma warning restore 612, 618
         }

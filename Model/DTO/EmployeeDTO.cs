@@ -20,6 +20,13 @@ namespace Model.DTO
         public string State { get; set; }
         public string Country { get; set; }
         public string SkillsIds { get; set; }
+        public decimal Basic { get; set; }
+        public decimal TA { get; set; }
+        public decimal DA { get; set; }
+        public decimal Bonus { get; set; }
+
+
+
         public int Flag { get; set; }
 
     }

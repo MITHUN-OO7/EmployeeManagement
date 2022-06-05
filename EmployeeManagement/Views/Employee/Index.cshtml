@@ -4,48 +4,253 @@
 }
 <div class="container">
     <button type="button" class="btn btn-primary" id="btnAddEmployee">Add Employee</button>
-    <table class="table table-striped">
+    <table class="table table-striped" id="tblEmployee">
         <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
+                <th>Emp Id</th>
+
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>DOB</th>
+                <th>Address</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td colspan="2">Larry the Bird</td>
-            </tr>
-        </tbody>
     </table>
 </div>
+<div class="container mt-9">
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Modal Heading</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="container">
+                            <div style="font-size: 18px; font-weight: bold;">Personal Details</div>
+                            <table>
+
+                                <tbody>
+                                    <tr>
+                                        <td>First Name</td>
+                                        <td><input type="text" id="txtFName" class="form-control" /></td>
+                                        <td>Last Name</td>
+                                        <td><input type="text" id="txtLName" class="form-control" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>DOB</td>
+                                        <td><input type="text" id="txtDOB" class="form-control" /></td>
+                                        <td>Email</td>
+                                        <td><input type="text" id="txtEmail" class="form-control" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Address</td>
+                                        <td><input type="text" id="txtAddress" class="form-control" /></td>
+                                        <td>City</td>
+                                        <td><input type="text" id="txtCity" class="form-control" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>State</td>
+                                        <td><input type="text" id="txtState" class="form-control" /></td>
+                                        <td>Country</td>
+                                        <td><input type="text" id="txtCountry" class="form-control" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Employment Date</td>
+                                        <td><input type="text" id="txtEmploymentDate" class="form-control" /></td>
+                                        <td>Skills</td>
+                                        <td><select id="ddlSkills" style="width:400px" multiple></select></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <br />
+                        <div class="container">
+                            <div style="font-size: 18px; font-weight: bold;">Payroll</div>
+                            <table>
+
+                                <tbody>
+                                    <tr>
+                                        <td>Basic</td>
+                                        <td><input type="number" id="txtBasic" class="form-control" /></td>
+                                        <td>TA</td>
+                                        <td><input type="number" id="txtTA" class="form-control" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>DA</td>
+                                        <td><input type="number" id="txtDA" class="form-control" /></td>
+                                        <td>Bonus</td>
+                                        <td><input type="number" id="txtBonus" class="form-control" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" id="btnUpdate" onclick="update()">Update</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<input type="hidden" id="hdnId" value="0"/>
+
 <script type="text/javascript">
     $(document).ready(function() {
-        getEmployee();
+        $('#ddlSkills').select2();
+        getSkills();
+        getEmployees();
     })
     $('#btnAddEmployee').click(function() {
         document.location = '@Url.Action("AddEmployee","Employee")';
     });
-    function getEmployee() {
+    function getSkills() {
+        $.ajax({
+            url: 'Employee/GetSkills',
+            type: 'GET',
+            success: function(result, textStatus, xhr) {
+                console.log(result);
+                for (var i = 0; i < result.length; i++) {
+                    $('#ddlSkills').append($('<option/>').attr("value", result[i].id).text(result[i].name), "name", result[i].Name);
+                }
+            },
+            error: function(data) {
+            }
+        });
+    }
+
+    function getEmployees() {
         $.ajax({
             url: 'Employee/GetEmployee',
             type: 'GET',
             success: function(data, textStatus, xhr) {
+                console.log(data);
+                var table = $('#tblEmployee').DataTable();
+                table.destroy();
+                $("#tblEmployee tr:gt(0)").remove();
+                $('#tblEmployee').DataTable({
+                    "bAutoWidth": false,
+                    "aaData": data,
+                    "aoColumns": [
+                        { "data": "employeeCode" },
+                        { "data": "firstName" },
+                        { "data": "lastName" },
+
+                        {
+                            data: 'dob', name: 'dob',
+                            "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                                $(nTd).text(moment(sData).format('DD-MMM-YYYY'));
+                            }
+                        },
+                        { "data": "address" },
+                        { 'data': null, "bSortable": false, "render": function(data) { return '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="getEmployeeDetail(' + data.id + ', this)">Detail</button>' } },
+                        { 'data': null, "bSortable": false, "render": function(data) { return '<button type="button" class="btn btn-danger"  onclick="deleteEmployee(' + data.id + ')">Delete</button>' } },
+
+                    ]
+                });
+            },
+            error: function(data) {
+            }
+        });
+    }
+
+    function getEmployeeDetail(id) {
+        $.ajax({
+            url: 'Employee/GetEmpDetail',
+            type: 'POST',
+            data: { 'id': id },
+            success: function(data, textStatus, xhr) {
+                console.log(data);
+                $('#hdnId').val(data.employee.id)
+                $("#txtFName").val(data.employee.firstName);
+                $("#txtLName").val(data.employee.lastName);
+                $("#txtDOB").val(moment(data.employee.dob).format("DD-MMM-YYYY"));
+                $("#txtEmail").val(data.employee.email);
+                $("#txtEmploymentDate").val(moment(data.employee.employmentDate).format("DD-MMM-YYYY"));
+                $("#txtAddress").val(data.employee.address);
+                $("#txtCity").val(data.employee.city);
+                $("#txtState").val(data.employee.state);
+                $("#txtCountry").val(data.employee.country);
+                $("#ddlSkills").val(data.skills.map(a => a.id)).change();;
+                $("#txtBasic").val(data.payroll.basic);
+                $("#txtTA").val(data.payroll.ta);
+                $("#txtDA").val(data.payroll.da);
+                $("#txtBonus").val(data.payroll.bonus);
 
             },
             error: function(data) {
             }
         });
     }
+
+    function deleteEmployee(id) {
+        var employeeDTO = new Object();
+        employeeDTO.id = id;
+        employeeDTO.Flag = 2;
+        employeeDTO.DOB = moment().format("DD-MMM-YYYY");
+        employeeDTO.EmploymentDate = moment().format("DD-MMM-YYYY");
+        console.log(employeeDTO)
+
+
+        $.ajax({
+            url: 'Employee/AddEmployeeDetail',
+            type: 'POST',
+            data: { employeeDTO },
+            success: function(result, textStatus, xhr) {
+                alert('Deleted');
+                getEmployees();
+            },
+            error: function(data) {
+            }
+        });
+    }
+    function update() {
+        var employeeDTO = new Object();
+        employeeDTO.id = $('#hdnId').val();
+        employeeDTO.FirstName = $("#txtFName").val();
+        employeeDTO.LastName = $("#txtLName").val();
+        employeeDTO.DOB = $("#txtDOB").val();
+        employeeDTO.Email = $("#txtEmail").val();
+        employeeDTO.EmploymentDate = $("#txtEmploymentDate").val();
+        employeeDTO.Address = $("#txtAddress").val();
+        employeeDTO.City = $("#txtCity").val();
+        employeeDTO.State = $("#txtState").val();
+        employeeDTO.Country = $("#txtCountry").val();
+        employeeDTO.SkillsIds = $("#ddlSkills").val().toString();
+        employeeDTO.Basic= $("#txtBasic").val();
+        employeeDTO.TA= $("#txtTA").val();
+        employeeDTO.DA = $("#txtDA").val();
+        employeeDTO.Bonus= $("#txtBonus").val();
+        employeeDTO.Flag = 1;
+        console.log(employeeDTO)
+
+
+        $.ajax({
+            url: 'Employee/AddEmployeeDetail',
+            type: 'POST',
+            data: { employeeDTO },
+            success: function(result, textStatus, xhr) {
+                alert("Detail Updated");
+            },
+            error: function(data) {
+            }
+        });
+    }
+
 </script>

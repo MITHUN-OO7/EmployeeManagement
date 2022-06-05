@@ -9,7 +9,7 @@ namespace Model.Entity
     public class Employee
     {
         public int Id { get; set; }
-        public int EmployeeId { get; set; }
+        public int EmployeeCode { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DOB { get; set; }
@@ -20,5 +20,9 @@ namespace Model.Entity
         public string State { get; set; }
         public string Country { get; set; }
         public ICollection<EmployeeSkills> EmployeeSkills { get; set; }
+        public ICollection<Skill> Skills { get; set; }
+
+        
+
     }
 }
